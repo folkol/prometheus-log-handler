@@ -13,5 +13,7 @@ public class PrometheusHandlerTest {
 
         Logger logger = Logger.getLogger(PrometheusHandlerTest.class.getName());
         logger.log(Level.SEVERE, "lollers", new RuntimeException("nisse"));
+        logger.log(Level.SEVERE, "lollers", new RuntimeException("nisse"));
+        logger.log(Level.SEVERE, "lollers", new IllegalArgumentException("sadada"));
     }
 }
