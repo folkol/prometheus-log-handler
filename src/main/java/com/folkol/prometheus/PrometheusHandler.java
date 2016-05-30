@@ -22,7 +22,7 @@ public class PrometheusHandler extends Handler {
         if(counter == null) {
             counter = Counter.build()
                           .name("log-handler")
-                          .help(record.toString().replaceAll("[^a-zA-Z]", "-"))
+                          .help(record.toString().replaceAll("[^a-zA-Z]", "_"))
                           .labelNames(label)
                           .register();
             counters.put(klass, counter);
