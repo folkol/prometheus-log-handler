@@ -18,11 +18,11 @@ public class PrometheusHandler extends Handler {
     public void publish(LogRecord record) {
         Class<? extends Throwable> klass = record.getThrown().getClass();
         Counter counter = counters.get(klass);
-        String label = klass.getName().replaceAll("[^a-z]", "_");
+        String label = klass.getName().replaceAll("[^a-zA-Z=]", "_");
         if(counter == null) {
             counter = Counter.build()
                           .name("log-handler")
-                          .help(record.toString())
+                          .help(record.toString().replaceAll("[^a-zA-Z]", "-"))
                           .labelNames(label)
                           .register();
             counters.put(klass, counter);
