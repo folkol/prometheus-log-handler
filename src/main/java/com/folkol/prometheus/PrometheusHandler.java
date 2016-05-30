@@ -21,7 +21,7 @@ public class PrometheusHandler extends Handler {
         String label = klass.getName().replaceAll("[^a-zA-Z=]", "_");
         if(counter == null) {
             counter = Counter.build()
-                          .name("log-handler")
+                          .name("log_handler")
                           .help(record.toString().replaceAll("[^a-zA-Z]", "_"))
                           .labelNames(label)
                           .register();
