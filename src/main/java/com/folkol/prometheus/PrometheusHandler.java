@@ -33,8 +33,8 @@ public class PrometheusHandler extends Handler {
         StringJoiner stringJoiner = new StringJoiner("_");
         Throwable cause = record.getThrown();
         while (cause != null && !seen.contains(cause)) {
-            stringJoiner.add(cause.getClass().getSimpleName());
             seen.add(cause);
+            stringJoiner.add(cause.getClass().getSimpleName());
             cause = cause.getCause();
         }
         stringJoiner.add(record.getMessage());
