@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class PrometheusHandler extends Handler {
@@ -20,6 +21,9 @@ public class PrometheusHandler extends Handler {
 
     @Override
     public void publish(LogRecord record) {
+        if (record.getLevel().intValue() < Level.WARNING.intValue()) {
+            return;
+        }
         String label = calculateLabel(record);
         counter.labels(label).inc();
     }
