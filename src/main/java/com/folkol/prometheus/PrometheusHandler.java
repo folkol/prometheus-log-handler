@@ -2,43 +2,48 @@ package com.folkol.prometheus;
 
 import io.prometheus.client.Counter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 public class PrometheusHandler extends Handler {
-    static final Map<Class, Counter> counters = new HashMap<>();
-
-    public PrometheusHandler() {
-        System.out.println("wut");
-    }
+    public static final String HANDLER_NAME = "log_messages_total";
+    public static final String CLASS_LABEL = "cause";
+    private static final Counter counter =
+        Counter.build()
+            .name(HANDLER_NAME)
+            .help("This counter will count Java Util Logging messages.")
+            .labelNames(CLASS_LABEL)
+            .register();
 
     @Override
     public void publish(LogRecord record) {
-        Class<? extends Throwable> klass = record.getThrown().getClass();
-        Counter counter = counters.get(klass);
-        String label = klass.getName().replaceAll("[^a-zA-Z=]", "_");
-        if(counter == null) {
-            counter = Counter.build()
-                          .name("log_handler_" + label)
-                          .help(record.toString().replaceAll("[^a-zA-Z]", "_"))
-                          .register();
-            counters.put(klass, counter);
+        String label = calculateLabel(record);
+        counter.labels(label).inc();
+    }
+
+    private String calculateLabel(LogRecord record) {
+        Set<Throwable> seen = new HashSet<>();
+        StringJoiner stringJoiner = new StringJoiner("_");
+        Throwable cause = record.getThrown();
+        while (cause != null && !seen.contains(cause)) {
+            stringJoiner.add(cause.getClass().getSimpleName());
+            seen.add(cause);
+            cause = cause.getCause();
         }
-        counter.inc();
+        stringJoiner.add(record.getMessage());
+        return stringJoiner.toString().replaceAll("\\W+", "");
     }
 
     @Override
     public void flush() {
-        System.err.println("Flushing");
+        // NOP
     }
 
     @Override
     public void close() throws SecurityException {
-        System.err.println("Closing");
-        for(Counter c : counters.values()) {
-            System.out.println(c.collect());
-        }
+        // NOP
     }
 }
